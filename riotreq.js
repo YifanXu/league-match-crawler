@@ -1,9 +1,10 @@
 const axios = require('axios')
+const config = require('./config.json')
 var AUTH_KEY
 var plathost
 var reghost
 
-const minReqInterval = 1500
+const minReqInterval = config.minReqInterval
 
 var lastPlatformRequest = 0
 var lastRegionRequest = 0

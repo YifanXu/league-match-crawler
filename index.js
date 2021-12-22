@@ -1,10 +1,9 @@
 const { init, request } = require('./riotreq.js')
 const apikey = require('./apikey.json')
+const config = require('./config.json')
 const fs = require('fs')
 
-init(apikey.key, 'na1', 'americas')
-
-const matchHistoryCount = 20
+init(apikey.key, config.platform, config.region)
 
 async function spiderSearch (initPlayer, maxMatch = 1000) {
   const initPlayerInfo = await request(`/lol/summoner/v4/summoners/by-name/${initPlayer}`)
@@ -24,7 +23,7 @@ async function spiderSearch (initPlayer, maxMatch = 1000) {
 
   while (!failFlag && searchedMatches.length <= maxMatch && currentPlayer) {
     // Get Match IDs
-    const matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?queue=420&start=0&count=${matchHistoryCount}`, true)
+    const matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?queue=420&start=0&count=${config.matchHistoryCount}`, true)
     const promises = matches.map(async matchId => {
       if (searchedMatches.includes(matchId) || searchedMatches.length > maxMatch) {
         console.log(`Skipping ${matchId}`)
@@ -106,7 +105,7 @@ async function spiderSearch (initPlayer, maxMatch = 1000) {
 //   fs.writeFileSync('./output.json', str)
 // })
 
-spiderSearch('Ginsu')
+spiderSearch(config.initialPlayer)
 .then(res => {
   const str = JSON.stringify(res, null, 2)
   fs.writeFileSync('./output.json', str)

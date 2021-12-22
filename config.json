@@ -1,0 +1,8 @@
+{
+  "platform": "na1", 
+  "region": "americas",
+  "initialPlayer": "Ginsu",
+  "minReqInterval": 1500,
+  "matchHistoryCount": 20,
+  "maxMatches": 500
+}
