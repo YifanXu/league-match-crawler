@@ -31,6 +31,6 @@ There are parameters that you can adjust to customize the behavior of the script
 - **Region**: Routing Value of the target region (ex. "americas") (Learn more about [Routing Values](https://developer.riotgames.com/docs/lol#_routing-values))
 - **initialPlayer**: Summoner name of the player for the script to start searching from
 - **queueType**: Type of queue to gather the data from. Refer to the [List of Queue IDs](https://static.developer.riotgames.com/docs/lol/queues.json)
-- **minReqInterval**: The minimal time between each request as to not hit the [Rate Limit](https://developer.riotgames.com/docs/portal#web-apis_rate-limiting)
+- **minReqInterval**: The minimal time (in milliseconds) between each request as to not hit the [Rate Limit](https://developer.riotgames.com/docs/portal#web-apis_rate-limiting)
 - **matchHistoryCount**: The number of games to pull from the match history list for each player
 - **maxMatches**: The maximum number of the matches that the script for go through before terminating. The script will also terminate if it cannot find any more players.
