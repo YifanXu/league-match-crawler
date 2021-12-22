@@ -5,7 +5,7 @@ const fs = require('fs')
 
 init(apikey.key, config.platform, config.region)
 
-async function spiderSearch (initPlayer, maxMatch = 1000) {
+async function spiderSearch (initPlayer, maxMatch) {
   const initPlayerInfo = await request(`/lol/summoner/v4/summoners/by-name/${initPlayer}`)
 
   const searchedMatches = []
@@ -90,22 +90,7 @@ async function spiderSearch (initPlayer, maxMatch = 1000) {
   }
 }
 
-// request('/lol/summoner/v4/summoners/by-name/Ginsu')
-// .then(res => {
-//   const puuid = res.puuid
-//   return request(`/lol/match/v5/matches/by-puuid/${puuid}/ids`, true)
-// })
-// .then(res => {
-//   return Promise.all(res.map(matchId => {
-//     return request(`/lol/match/v5/matches/${matchId}`, true)
-//   }))
-// })
-// .then(res => {
-//   const str = JSON.stringify(res, null, 2)
-//   fs.writeFileSync('./output.json', str)
-// })
-
-spiderSearch(config.initialPlayer)
+spiderSearch(config.initialPlayer, config.maxMatches)
 .then(res => {
   const str = JSON.stringify(res, null, 2)
   fs.writeFileSync('./output.json', str)
