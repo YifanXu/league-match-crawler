@@ -55,7 +55,7 @@ async function request (endpoint, isRegional, authKeyId = -1) {
   const options = {
     method: 'GET',
     headers: { 
-      "X-Riot-Token": AUTH_KEYCHAIN[currentKey]
+      "X-Riot-Token": AUTH_KEYCHAIN[usedKeyId]
     },
     url: (isRegional ? reghost: plathost) + endpoint,
   }
