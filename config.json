@@ -1,9 +1,9 @@
 {
   "platform": "na1", 
   "region": "americas",
-  "initialPlayer": "Ginsu",
+  "initialPlayer": "Doublelift",
   "queueType": 420,
   "minReqInterval": 1500,
   "matchHistoryCount": 20,
-  "maxMatches": 100
+  "maxMatches": 10
 }
