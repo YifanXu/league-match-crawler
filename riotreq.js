@@ -61,7 +61,10 @@ async function request (endpoint, isRegional, authKeyId = -1) {
   }
 
   return axios(options)
-    .then(res => res.data)
+    .then(res => {
+      res.data.keyUsed = usedKeyId
+      return res.data
+    })
 }
 
 function sleep(ms) {

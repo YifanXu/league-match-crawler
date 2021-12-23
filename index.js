@@ -14,6 +14,7 @@ async function spiderSearch (initPlayer, maxMatch) {
 
   const playerQueueRoot = {
     puuid: initPlayerInfo.puuid,
+    keyUsed: 0,
     next: null
   }
 
@@ -23,7 +24,7 @@ async function spiderSearch (initPlayer, maxMatch) {
 
   while (!failFlag && searchedMatches.length < maxMatch && currentPlayer) {
     // Get Match IDs
-    const matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?${config.queueType === -1 ? "" : (`queueType=${config.queueType}&`)}start=0&count=${config.matchHistoryCount}`, true, 0)
+    const matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?${config.queueType === -1 ? "" : (`queueType=${config.queueType}&`)}start=0&count=${config.matchHistoryCount}`, true, currentPlayer.keyUsed)
     const promises = matches.map(async matchId => {
       if (searchedMatches.includes(matchId) || searchedMatches.length > maxMatch) {
         console.log(`Skipping ${matchId}`)
@@ -126,6 +127,7 @@ async function spiderSearch (initPlayer, maxMatch) {
         if(!isRepeat && n.puuid !== newId) {
           n.next = {
             puuid: newId,
+            keyUsed: matchInfo.keyUsed,
             next: null
           }
         }
