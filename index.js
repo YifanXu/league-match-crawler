@@ -6,7 +6,7 @@ const fs = require('fs')
 init(apikey.key, config.platform, config.region)
 
 async function spiderSearch (initPlayer, maxMatch) {
-  const initPlayerInfo = await request(`/lol/summoner/v4/summoners/by-name/${initPlayer}`)
+  const initPlayerInfo = await request(`/lol/summoner/v4/summoners/by-name/${initPlayer}`, false, 0)
 
   const searchedMatches = []
   var failFlag = false
@@ -23,7 +23,7 @@ async function spiderSearch (initPlayer, maxMatch) {
 
   while (!failFlag && searchedMatches.length < maxMatch && currentPlayer) {
     // Get Match IDs
-    const matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?${config.queueType === -1 ? "" : (`queueType=${config.queueType}&`)}start=0&count=${config.matchHistoryCount}`, true)
+    const matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?${config.queueType === -1 ? "" : (`queueType=${config.queueType}&`)}start=0&count=${config.matchHistoryCount}`, true, 0)
     const promises = matches.map(async matchId => {
       if (searchedMatches.includes(matchId) || searchedMatches.length > maxMatch) {
         console.log(`Skipping ${matchId}`)

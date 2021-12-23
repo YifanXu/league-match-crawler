@@ -3,7 +3,7 @@
   "region": "americas",
   "initialPlayer": "Doublelift",
   "queueType": 420,
-  "minReqInterval": 1500,
+  "minReqInterval": 1400,
   "matchHistoryCount": 20,
   "maxMatches": 300
 }
