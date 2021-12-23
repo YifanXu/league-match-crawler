@@ -35,16 +35,13 @@ async function request (endpoint, isRegional, authKeyId = -1) {
   }
   let lastReq = (isRegional ? lastRegionRequest[usedKeyId] : lastPlatformRequest[usedKeyId])
 
-  // console.log(`QUEUED     ${endpoint} at t=${time - startTime} (lastReq=${(isRegional ? lastRegionRequest : lastPlatformRequest) - startTime}) (REGIONAL = ${isRegional})`)
-
   while (time - minReqInterval + 10 < lastReq) {
-    // console.log(`DELAYED    ${endpoint} at t=${time - startTime} (lastReq=${(isRegional ? lastRegionRequest : lastPlatformRequest) - startTime}) (REGIONAL = ${isRegional})`)
     await sleep(minReqInterval)
     time = Date.now()
     lastReq = (isRegional ? lastRegionRequest[usedKeyId] : lastPlatformRequest[usedKeyId])
   }
 
-  console.log(`REQUESTING ${endpoint} with key ${usedKeyId} at t=${time - startTime} (lastReq=${(isRegional ? lastRegionRequest : lastPlatformRequest) - startTime}) (REGIONAL = ${isRegional})`)
+  console.log(`REQUESTING ${endpoint} with key ${usedKeyId} at t=${time - startTime} (lastReq=${(isRegional ? lastRegionRequest[usedKeyId] : lastPlatformRequest[usedKeyId]) - startTime}) (REGIONAL = ${isRegional})`)
 
   if(isRegional) {
     lastRegionRequest[usedKeyId] = time

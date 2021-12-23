@@ -5,5 +5,5 @@
   "queueType": 420,
   "minReqInterval": 1400,
   "matchHistoryCount": 20,
-  "maxMatches": 300
+  "maxMatches": 1000
 }
