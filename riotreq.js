@@ -11,6 +11,7 @@ var lastRegionRequest = []
 
 var startTime
 var currentKey = 0
+var abortFlag = false
 
 function init (keys, platform, region) {
   AUTH_KEYCHAIN = keys,
@@ -20,6 +21,10 @@ function init (keys, platform, region) {
   plathost = `https://${platform}.api.riotgames.com`
   reghost = `https://${region}.api.riotgames.com`
   startTime = Date.now()
+}
+
+function abort () {
+  abortFlag = true
 }
 
 async function request (endpoint, isRegional, authKeyId = -1) {
@@ -37,6 +42,7 @@ async function request (endpoint, isRegional, authKeyId = -1) {
 
   while (time - minReqInterval + 10 < lastReq) {
     await sleep(minReqInterval)
+    if (abortFlag) return
     time = Date.now()
     lastReq = (isRegional ? lastRegionRequest[usedKeyId] : lastPlatformRequest[usedKeyId])
   }
@@ -75,5 +81,6 @@ function sleep(ms) {
 
 module.exports = {
   init,
+  abort,
   request: request
 }

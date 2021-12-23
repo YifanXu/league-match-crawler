@@ -1,16 +1,19 @@
-const { init, request } = require('./riotreq.js')
+const { init, abort, request } = require('./riotreq.js')
 const apikey = require('./apikey.json')
 const config = require('./config.json')
 const fs = require('fs')
 
 init(apikey.key, config.platform, config.region)
 
+var abortFlag = false
+
 async function spiderSearch (initPlayer, maxMatch) {
   const initPlayerInfo = await request(`/lol/summoner/v4/summoners/by-name/${initPlayer}`, false, 0)
 
   const searchedMatches = []
-  var failFlag = false
   let totalPlayerScanned = 0
+  let failedMatchScans = 0
+  let failedPlayerScans = 0
 
   const playerQueueRoot = {
     puuid: initPlayerInfo.puuid,
@@ -22,18 +25,38 @@ async function spiderSearch (initPlayer, maxMatch) {
 
   let aggregate = {}
 
-  while (!failFlag && searchedMatches.length < maxMatch && currentPlayer) {
+  while (!abortFlag && searchedMatches.length - failedMatchScans < maxMatch && currentPlayer) {
+    let matches
     // Get Match IDs
-    const matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?${config.queueType === -1 ? "" : (`queueType=${config.queueType}&`)}start=0&count=${config.matchHistoryCount}`, true, currentPlayer.keyUsed)
+    try {
+      matches = await request(`/lol/match/v5/matches/by-puuid/${currentPlayer.puuid}/ids?${config.queueType === -1 ? "" : (`queueType=${config.queueType}&`)}start=0&count=${config.matchHistoryCount}`, true, currentPlayer.keyUsed)
+    }
+    catch (err) {
+      console.error(err)
+      failedPlayerScans++
+      return
+    }
+
     const promises = matches.map(async matchId => {
-      if (searchedMatches.includes(matchId) || searchedMatches.length > maxMatch) {
+      if (abortFlag || searchedMatches.includes(matchId) || searchedMatches.length - failedMatchScans >= maxMatch) {
         console.log(`Skipping ${matchId}`)
         return null
       }
       searchedMatches.push(matchId)
 
       // Get Match Data
-      const matchInfo = await request(`/lol/match/v5/matches/${matchId}`, true)
+      let matchInfo 
+      try {
+        matchInfo = await request(`/lol/match/v5/matches/${matchId}`, true)
+      }
+      catch (err) {
+        console.error(err)
+        failedMatchScans++
+        return
+      }
+
+      // Do not bother to start analyzing if the the program is aborted
+      if (abortFlag) return
 
       const champList = matchInfo.info.participants.map(participantInfo => ({
         name: participantInfo.championName,
@@ -135,10 +158,6 @@ async function spiderSearch (initPlayer, maxMatch) {
     })
 
     await Promise.all(promises)
-    .catch(err => {
-      console.error(err)
-      failFlag = true
-    })
 
     currentPlayer = currentPlayer.next
     totalPlayerScanned++
@@ -149,14 +168,22 @@ async function spiderSearch (initPlayer, maxMatch) {
 
   return {
     totalPlayerScanned,
+    failedScans: failedMatchScans,
     matchesScanned: searchedMatches.length,
     aggregate
   }
 }
 
-spiderSearch(config.initialPlayer, config.maxMatches)
+var processPromise = spiderSearch(config.initialPlayer, config.maxMatches)
 .then(res => {
   const str = JSON.stringify(res, null, 2)
   fs.writeFileSync('./output.json', str)
 })
-.catch(err => console.error(err))
+.catch(err => console.error(err)) 
+
+process.on('SIGINT', async () => {
+  console.log('Process Aborted, writing down existing aggregate...')
+  abortFlag = true
+  abort()
+  await processPromise
+});
